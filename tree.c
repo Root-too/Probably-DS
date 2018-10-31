@@ -3,111 +3,111 @@
 #include <string.h>
 
 typedef struct Node{
-    char data;
+    char *data; // Node storing the character
+    char *code; // Node storing it's morse code (Could have used backtracking, but it adds unnecessary time-complexity, so :P)
     struct Node *left, *right;
 }node;
 
-char *encoded = NULL;
+typedef struct Table{ // To effectively store morse code characters with thier code
+    char *code;
+    char *alphabet;
+}morse_table;
 
-node *create(char data){
+node *create(char *data, char *code){
     node *temp = (node *)malloc(sizeof(node));
-    temp->data = data;
+    temp->data = data; // Initializing character
+    temp->code = code; // Initializing it's morse code
     temp->left = temp->right = NULL;
     return temp;
 }
 
-node *make_a_tree(char arr[], node *root, int i, int n){
+node *make_a_tree(morse_table arr[], node *root, int i, int n){
     node *temp = NULL;
     if(i < n){
-        temp = create(arr[i]);
+        temp = create(arr[i].alphabet, arr[i].code);
         root = temp;
-        // Inserting left child
-        root->left = make_a_tree(arr, root->left, 2*i + 1, n);
-
-        // Inserting right child
-        root->right = make_a_tree(arr, root->right, 2*i + 2, n);
+        root->left = make_a_tree(arr, root->left, 2*i + 1, n); // Inserting left child
+        root->right = make_a_tree(arr, root->right, 2*i + 2, n); // Inserting right child
     }
     return root;
 }
 
-int encoder(char x, char *encoded){
-    static int i;
-    encoded[i] = x;
-    i++;
-    return i;
-}
-
-int to_morse(node *x, char key, char *encoded){
-    int found;
+void to_morse(node *x, char *key){ // DFS search to find the character
     if(!x){
-        return 0;
+        return;
     }
-    if(x->data == key){
-        return 1;
+    if(*(x->data) == *key){
+        printf("%s", x->code); // Printing it's morse code, once found
+        return;
     }
-    found = to_morse(x->left, key, encoded);
-    if(found){
-        encoder('.', encoded);
-        return 1;
-    }
-    found = to_morse(x->right, key, encoded);
-    if(found){
-        encoder('-', encoded);
-        return 1;
-    }
-    return 0;
+    to_morse(x->left, key);
+    to_morse(x->right, key);
 }
 
 void morse_to(node *x){
-    int i, j = 0;
+    int i;
     node *root = x;
-    char code[1000], ans[1000];
-    printf("Enter Morse code (Max length 1000)\n");
+    char code[100];
+    printf("Enter Morse code (Max length 100)\n");
     scanf(" %[^\n]", code);
-    code[strlen(code)] = ' ';
+    int len = strlen(code);
 
-    for(i=0; i<strlen(code); i++){
+    for(i=0; i<len; i++){
         if(code[i] == '.'){
-            // We go left
-            x = x->left;
+            x = x->left; // We go left
+            if(code[i+1] == ' ' || i+1 == len){ // If next character is space so we have to end up traversing and print the found character and go back to root
+                printf("%s", x->data);
+                x = root;
+                i++;
+            }
+            else if(code[i+1] == '/'){ // '/' implies space between words
+                printf("%s ", x->data);
+                x = root;
+                i++;
+            }
         }
         else if(code[i] == '-'){
-            // We go right
-            x = x->right;
-        }
-        else if(code[i] == ' '){
-            ans[j] = x->data;
-            x = root;
-            j++;
-        }
-        else{
-            ans[j] = x->data;
-            j++;
-            ans[j] = ' ';
-            x = root;
-            j++;
+            x = x->right; // We go right
+            if(code[i+1] == ' ' || i+1 == len){ // If next character is space so we have to end up traversing and print the found character and go back to root
+                printf("%s", x->data);
+                x = root;
+                i++;
+            }
+            else if(code[i+1] == '/'){ // '/' implies space between words
+                printf("%s ", x->data);
+                x = root;
+                i++;
+            }
         }
     }
-    ans[j] = '\0';
-    printf("Text: %s\n", ans);
 }
-
-// char *clean_up(char **encoded){
-//     if(*encoded){
-//         free(*encoded);
-//         return (char *)malloc(100*sizeof(char));
-//     }
-//     return (char *)malloc(100*sizeof(char));
-// }
 
 int main(void){
     int i, choice = -1, store;
-    char *text = (char *)malloc(100*sizeof(char));
+    char text[50];
 
-    char morse_code_data[] = {'*', 'e', 't', 'i', 'a', 'n', 'm', 's', 'u', 'r', 'w', 'd', 'k', 'g', 'o', 'h', 'v', 'f', '_', 'l', '_', 'p', 'j', 'b', 'x', 'c', 'y', 'z', 'q', '_', '_', '5', '4', '_', '3', '_', '_', '_', '2', '_', '_', '+', '_', '_', '_', '_', '1', '6', '=', '/', '_', '_', '_', '_', '_', '7', '_', '_', '_', '8', '_', '9', '0'};
-    int n = sizeof(morse_code_data) / sizeof(morse_code_data[0]);
-    node *root = make_a_tree(morse_code_data, NULL, 0, n);
-    // char *encoded = NULL;
+	morse_table dict[] = { // An array with all the nodes arranged in level order
+        {"*", "*"},
+
+        {".", "E"}, {"-", "T"},
+
+        {"..", "I"}, {".-", "A"}, {"-.", "N"}, {"--", "M"},
+
+        {"...", "S"}, {"..-", "U"}, {".-.", "R"}, {".--", "W"},
+        {"-..", "D"}, {"-.-", "K"}, {"--.", "G"}, {"---", "O"},
+
+        {"....", "H"}, {"...-", "V"}, {"..-.", "F"}, {"_","_"},
+        {".-..", "L"}, {"_", "_"}, {".--.", "P"}, {".---", "J"},
+        {"-...", "B"}, {"-..-", "X"}, {"-.-.", "C"}, {"-.--", "Y"},
+        {"--..", "Z"}, {"--.-", "Q"}, {"_", "_"}, {"_", "_"},
+
+        {".....", "5"}, {"....-", "4"}, {"_", "_"}, {"...--", "3"}, {"_", "_"}, {"_", "_"}, {"_", "_"}, {"..---", "2"}, {"_", "_"},
+        {"_", "_"}, {"_", "_"}, {"_", "_"}, {"_", "_"}, {"_", "_"}, {"_", "_"},
+        {".----", "1"}, {"-....", "6"}, {"_", "_"}, {"_", "_"}, {"_", "_"}, {"_", "_"}, {"_", "_"}, {"_", "_"}, {"_", "_"}, {"--...", "7"}, {"_", "_"}, {"_", "_"}, {"_", "_"},{"---..", "8"}, {"_", "_"}, {"----.","9"}, {"-----", "0"}
+    };
+
+    int n = sizeof(dict) / sizeof(dict[0]);
+    node *root = make_a_tree(dict, NULL, 0, n); // Constructing the tree from the above level-order
 
     while(choice){
         printf("\nMenu:\n\n");
@@ -115,32 +115,23 @@ int main(void){
         printf("2. Text to Morse Code\n");
         printf("0. Exit\n");
         scanf("%d", &choice);
-        // encoded = clean_up(&encoded);
-        // encoded = (char *)malloc(1000 * sizeof(char));
+
         switch(choice){
             case 1: morse_to(root);
                     break;
-            case 2: printf("Enter Text (Max length 20)\n");
+            case 2: printf("Enter Text (Max length 50)\n");
                     scanf(" %[^\n]", text);
                     printf("Morse code: ");
                     for(i=0; i<strlen(text); i++){
-                        char encoded[1000];
                         if(text[i] == ' ')
                             printf("/");
-
-                        to_morse(root, text[i], encoded);
-                        store = encoder(' ', encoded);
-                        encoded[store] = '\0';
-                        printf("%d\n", store);
-                        // for(i=strlen(encoded); i>=0; i--)
-                        //     printf("%c", encoded[i]);
-
+                        else{
+                            to_morse(root, text + i);
+                            if(text[i+1] != ' ')
+                                printf(" ");
+                        }
                     }
-                    //
-                    // // printf("\n%ld\n", strlen(encoded));
-                    // for(i=strlen(encoded); i>=0; i--)
-                    //     printf("%c", encoded[i]);
-                    // printf("\n");
+                    printf("\n");
                     break;
             case 0: break;
             default : printf("Wrong choice.\n");

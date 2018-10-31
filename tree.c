@@ -86,7 +86,8 @@ void morse_to(node *x){
 void upper_case(char arr[]){
     int i, n = strlen(arr);
     for(i=0; i<n; i++){
-        arr[i] = toupper(arr[i]);
+        if(isalpha(arr[i]))
+            arr[i] = toupper(arr[i]);
     }
 }
 

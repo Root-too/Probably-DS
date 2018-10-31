@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 typedef struct Node{
     char *data; // Node storing the character
@@ -82,9 +83,16 @@ void morse_to(node *x){
     }
 }
 
+void upper_case(char arr[]){
+    int i, n = strlen(arr);
+    for(i=0; i<n; i++){
+        arr[i] = toupper(arr[i]);
+    }
+}
+
 int main(void){
     int i, choice = -1, store;
-    char text[50];
+    char text[50]; // Input texzt for encoding to morse code
 
 	morse_table dict[] = { // An array with all the nodes arranged in level order
         {"*", "*"},
@@ -121,6 +129,7 @@ int main(void){
                     break;
             case 2: printf("Enter Text (Max length 50)\n");
                     scanf(" %[^\n]", text);
+                    upper_case(text);
                     printf("Morse code: ");
                     for(i=0; i<strlen(text); i++){
                         if(text[i] == ' ')

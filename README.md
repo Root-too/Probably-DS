@@ -1,12 +1,12 @@
 # Dead Simple Morse code converter :fire:
 ---
 
-We have used a Binary tree for laying out all the alphabets, numbers and special symbols and perform DFS and tree traversal for interconversions.
+We have used a Binary tree for laying out all the alphabets, numbers and perform DFS and tree traversal for interconversions.
 
 ### Add-Ons
 
 - [x] Morse code to text.
-- [ ] Text to Morse code.
+- [x] Text to Morse code.
 - [ ] Adding GUI.
 
 ### Contributors
@@ -20,4 +20,4 @@ We have used a Binary tree for laying out all the alphabets, numbers and special
 
 
 
-> Repository for our college project on Data Structures.
+> Repo for our college project on Data Structures.

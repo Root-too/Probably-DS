@@ -52,7 +52,7 @@ void morse_to(node *x){
     printf("Enter Morse code (Max length 100)\n");
     scanf(" %[^\n]", code);
     int len = strlen(code);
-
+    printf("Text: "); // Will return allin CAPS btw
     for(i=0; i<len; i++){
         if(code[i] == '.'){
             x = x->left; // We go left
@@ -81,6 +81,7 @@ void morse_to(node *x){
             }
         }
     }
+    printf("\n");
 }
 
 void upper_case(char arr[]){

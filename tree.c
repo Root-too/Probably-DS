@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
+// morse code converter
 typedef struct Node{
     char *data; // Node storing the character
     char *code; // Node storing it's morse code (Could have used backtracking, but it adds unnecessary time-complexity, so :P)
